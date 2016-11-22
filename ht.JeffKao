@@ -1,0 +1,43 @@
+## This function allows R to cache the matrix inverse you had calculated before, 
+## so next time you input the same matrix vector, R won't have to recalculate again.
+## This function is made of two parts, first part create a list which can cache data in an environment that is different from the current one,
+## second part is a function which can tell if the vector had been calculated or not.
+## If the vector had been calculated, then the function will return "getting cached data" and the matrix inverse,
+## otherwise it will just calculate it and print the result.
+## To operate this function, you need to assign the first function with your matrix vector to a variable, 
+## then insert the variable into the second function, and the result will be printed.
+## Ex: x<-matrix(1:4,2,2), a<-makeCacheMatrix(x), and the result will show in cacheSolve(a).
+## Please note that only the invertible matrix will show the result.
+
+        
+## This function creates a special "matrix" object that can cache its inverse.     
+        
+makeCacheMatrix <- function(x = matrix()) {
+  s <- NULL
+  set <- function(y) {
+    x <<- y
+    s <<- NULL
+  }
+  get <- function() x
+  setinverse <- function(solve) s <<- solve
+  getinverse <- function() s
+  list(set = set, get = get,
+       setinverse = setinverse,
+       getinverse = getinverse)
+}
+
+## This function computes the inverse of the special "matrix" returned by makeCacheMatrix above. 
+## If the inverse has already been calculated (and the matrix has not changed), 
+## then the cachesolve should retrieve the inverse from the cache.
+
+cacheSolve<-function(x,...){
+  s <- x$getinverse()
+  if (!is.null(s)) {
+    message("getting cached data")
+    return(s)
+  }
+  data <- x$get()
+  s <- solve(data, ...)
+  x$setinverse(s)
+  s
+} 
